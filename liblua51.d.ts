@@ -20,13 +20,15 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-//Not available until TS 3.0
-declare type unknown = {} | null | undefined;
+declare type unknown = {} | null | undefined; //Not available until TS 3.0
+declare interface userdata { readonly _userdata: never; }
+declare interface thread { readonly _thread: never; }
 
 //Required TS interfaces
 declare interface Array<T>
 {
-	length: number; //tstl will convert to # operator
+	[index: number]: T;
+	readonly length: number; //tstl will convert to # operator
 }
 
 declare interface String
@@ -73,8 +75,8 @@ declare namespace Lua
 		boolean: boolean;
 		table: Object;
 		function: Function;
-		thread: coroutine.Thread;
-		userdata: unknown;
+		thread: thread;
+		userdata: userdata;
 	}
 }
 
@@ -83,7 +85,7 @@ declare namespace Lua
 /**
 * Issues an error when the value of its argument v is false (i.e., nil or false); otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
 */
-declare function assert(v: boolean, message?: string): boolean;
+declare function assert<T>(v: T | null | false, message?: string): T;
 
 /**
 * This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
@@ -116,7 +118,12 @@ declare function error(message: string, level?: number): never;
 /**
 * A global variable (not a function) that holds the global environment (that is, _G._G = _G). Lua itself does not use this variable; changing its value does not affect any environment, nor vice-versa. (Use setfenv to change environments.)
 */
-declare const _G: Object;
+declare const _G:
+{
+	package: typeof package; //Allow access to package namespace to bypass reserved word error in strict mode
+	[key: string]: unknown;
+	[index: number]: unknown;
+};
 
 /**
 * Returns the current environment in use by the function. f can be a Lua function or a number that specifies the function at that stack level: Level 1 is the function calling getfenv. If the given function is not a Lua function, or if f is 0, getfenv returns the global environment. The default for f is 1.
@@ -296,12 +303,10 @@ declare function xpcall<R, E>(f: Function, err: (errorobj: unknown) => E): (true
 //Coroutine
 declare namespace coroutine
 {
-	export class Thread {}
-
 	/**
 	* Creates a new coroutine, with body f. f must be a Lua function. Returns this new coroutine, an object with type "thread".
 	*/
-	export function create(f: Function): Thread;
+	export function create(f: Function): thread;
 
 	/**
 	* Starts or continues the execution of coroutine co. The first time you resume a coroutine, it starts running its body. The values val1, ··· are passed as the arguments to the body function. If the coroutine has yielded, resume restarts it; the values val1, ··· are passed as the results from the yield.
@@ -310,17 +315,17 @@ declare namespace coroutine
 	*
 	* !TupleReturn
 	*/
-	export function resume(co: Thread, ...args: unknown[]): (true | unknown)[] | [false, string]; //Fix in TS 3.0: [true, ...unknown[]] | [false, string]
+	export function resume(co: thread, ...args: unknown[]): (true | unknown)[] | [false, string]; //Fix in TS 3.0: [true, ...unknown[]] | [false, string]
 
 	/**
 	* Returns the running coroutine, or nil when called by the main thread.
 	*/
-	export function running(): Thread | null;
+	export function running(): thread | null;
 
 	/**
 	* Returns the status of coroutine co, as a string: "running", if the coroutine is running (that is, it called status); "suspended", if the coroutine is suspended in a call to yield, or if it has not started running yet; "normal" if the coroutine is active but not running (that is, it has resumed another coroutine); and "dead" if the coroutine has finished its body function, or if it has stopped with an error.
 	*/
-	export function status(co: Thread): "running" | "suspended" | "normal" | "dead";
+	export function status(co: thread): "running" | "suspended" | "normal" | "dead";
 
 	/**
 	* Creates a new coroutine, with body f. f must be a Lua function. Returns a function that resumes the coroutine each time it is called. Any arguments passed to the function behave as the extra arguments to resume. Returns the same values returned by resume, except the first boolean. In case of error, propagates the error.
@@ -438,13 +443,6 @@ declare namespace package
 
 declare namespace string
 {
-	export type StringRepl = string | number | false | null;
-
-	export interface StringReplFunction
-	{
-		(...matches: string[]): StringRepl;
-	}
-
 	/**
 	* Returns the internal numerical codes of the characters s[i], s[i+1], ···, s[j]. The default value for i is 1; the default value for j is i.
 	*
@@ -505,7 +503,7 @@ declare namespace string
 	*
 	* !TupleReturn
 	*/
-	export function gsub(s: string, pattern: string, repl: string | { [key: string]: StringRepl } | StringReplFunction, n?: number): [string, number];
+	export function gsub(s: string, pattern: string, repl: string | { [key: string]: string | number | false | null } | ((...matches: string[]) => string | number | false | null), n?: number): [string, number];
 
 	/**
 	* Receives a string and returns its length. The empty string "" has length 0. Embedded zeros are counted, so "a\000bc\000" has length 5.
@@ -1016,7 +1014,7 @@ declare namespace debug
 	/**
 	* Returns the current hook settings of the thread, as three values: the current hook function, the current hook mask, and the current hook count (as set by the debug.sethook function).
 	*/
-	export function gethook(thread?: coroutine.Thread): [null, 0] | [Hook, number, string | null];
+	export function gethook(thread?: thread): [null, 0] | [Hook, number, string | null];
 
 	/**
 	* Returns a table with information about a function. You can give the function directly, or you can give a number as the value of function, which means the function running at level function of the call stack of the given thread: level 0 is the current function (getinfo itself); level 1 is the function that called getinfo; and so on. If function is a number larger than the number of active functions, then getinfo returns nil.
@@ -1025,7 +1023,7 @@ declare namespace debug
 	*
 	* For instance, the expression debug.getinfo(1,"n").name returns a table with a name for the current function, if a reasonable name can be found, and the expression debug.getinfo(print) returns a table with all available information about the print function.
 	*/
-	export function getinfo(thread: coroutine.Thread, func: Function | number, what?: string): Info;
+	export function getinfo(thread: thread, func: Function | number, what?: string): Info;
 	export function getinfo(func: Function | number, what?: string): Info;
 
 	/**
@@ -1035,7 +1033,7 @@ declare namespace debug
 	*
 	* !TupleReturn
 	*/
-	export function getlocal(thread: coroutine.Thread, level: number, local: number): [string, unknown] | [null];
+	export function getlocal(thread: thread, level: number, local: number): [string, unknown] | [null];
 	/** !TupleReturn */
 	export function getlocal(level: number, local: number): [string, unknown] | [null];
 
@@ -1072,14 +1070,14 @@ declare namespace debug
 	*
 	* When the hook is called, its first parameter is a string describing the event that has triggered its call: "call", "return" (or "tail return", when simulating a return from a tail call), "line", and "count". For line events, the hook also gets the new line number as its second parameter. Inside a hook, you can call getinfo with level 2 to get more information about the running function (level 0 is the getinfo function, and level 1 is the hook function), unless the event is "tail return". In this case, Lua is only simulating the return, and a call to getinfo will return invalid data.
 	*/
-	export function sethook(thread: coroutine.Thread, hook: Hook, mask: string, count?: number): void;
+	export function sethook(thread: thread, hook: Hook, mask: string, count?: number): void;
 	export function sethook(hook: Hook, mask: string, count?: number): void;
 	export function sethook(): void;
 
 	/**
 	* This function assigns the value value to the local variable with index local of the function at level level of the stack. The function returns nil if there is no local variable with the given index, and raises an error when called with a level out of range. (You can call getinfo to check whether the level is valid.) Otherwise, it returns the name of the local variable.
 	*/
-	export function setlocal(thread: coroutine.Thread, level: number, local: number, value: unknown): string | null;
+	export function setlocal(thread: thread, level: number, local: number, value: unknown): string | null;
 	export function setlocal(level: number, local: number, value: unknown): string | null;
 
 	/**
@@ -1095,6 +1093,6 @@ declare namespace debug
 	/**
 	* Returns a string with a traceback of the call stack. An optional message string is appended at the beginning of the traceback. An optional level number tells at which level to start the traceback (default is 1, the function calling traceback).
 	*/
-	export function traceback(thread: coroutine.Thread, message: string, level?: number): string;
+	export function traceback(thread: thread, message: string, level?: number): string;
 	export function traceback(message: string, level?: number): string;
 }
