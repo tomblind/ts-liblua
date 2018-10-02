@@ -85,7 +85,7 @@ declare namespace Lua
 /**
 * Issues an error when the value of its argument v is false (i.e., nil or false); otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
 */
-declare function assert<T>(v: T | null | false, message?: string): T;
+declare function assert<T>(v: T | null | false | undefined, message?: string): T;
 
 /**
 * This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
