@@ -20,7 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-declare type unknown = {} | null | undefined; //Not available until TS 3.0
+declare type unknown = {} | null | undefined | void; //Not available until TS 3.0
 declare interface userdata { readonly _userdata: never; }
 declare interface thread { readonly _thread: never; }
 
