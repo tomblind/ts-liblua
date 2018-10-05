@@ -21,44 +21,11 @@
 //SOFTWARE.
 
 declare type unknown = {} | null | undefined | void; //Not available until TS 3.0
-declare interface userdata { readonly _userdata: never; }
-declare interface thread { readonly _thread: never; }
 
-//Required TS interfaces
-declare interface Array<T>
-{
-	[index: number]: T;
-	readonly length: number; //tstl will convert to # operator
-}
-
-declare interface String
-{
-	readonly length: number; //tstl will convert to # operator
-}
-
-declare interface Function
-{
-	(...args: any[]): any;
-}
-
-declare interface Object
-{
-	[key: string]: unknown;
-	[index: number]: unknown;
-}
-
-declare interface Boolean {}
-declare interface Number {}
-declare interface IArguments extends Array<unknown> {}
-declare interface RegExp {}
-
-//Helper types
 declare namespace Lua
 {
-	/**
-	* Lua type names as reported by type()
-	*/
-	export type TypeName = "nil" | "number" | "string" | "boolean" | "table" | "function" | "thread" | "userdata";
+	export interface UserData { readonly _lua_userdata: never; }
+	export interface Thread { readonly _lua_thread: never; }
 
 	/**
 	* This maps lua type names to their equivalent typescript types. This can be used for a type assertion function like this:
@@ -75,12 +42,15 @@ declare namespace Lua
 		boolean: boolean;
 		table: Object;
 		function: Function;
-		thread: thread;
-		userdata: userdata;
+		thread: Thread;
+		userdata: UserData;
 	}
-}
 
-//Global
+	/**
+	* Lua type names as reported by type()
+	*/
+	export type TypeName = keyof TypeMap;
+}
 
 /**
 * Issues an error when the value of its argument v is false (i.e., nil or false); otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
@@ -300,13 +270,12 @@ declare let _VERSION: string;
 */
 declare function xpcall<R, E>(f: Function, err: (errorobj: unknown) => E): (true | R)[] | [false, E]; //What is type of errorobj? Fix in TS 3.0: [true, ...R[]] | [false, E]
 
-//Coroutine
 declare namespace coroutine
 {
 	/**
 	* Creates a new coroutine, with body f. f must be a Lua function. Returns this new coroutine, an object with type "thread".
 	*/
-	export function create(f: Function): thread;
+	export function create(f: Function): Lua.Thread;
 
 	/**
 	* Starts or continues the execution of coroutine co. The first time you resume a coroutine, it starts running its body. The values val1, ··· are passed as the arguments to the body function. If the coroutine has yielded, resume restarts it; the values val1, ··· are passed as the results from the yield.
@@ -315,17 +284,17 @@ declare namespace coroutine
 	*
 	* !TupleReturn
 	*/
-	export function resume(co: thread, ...args: unknown[]): (true | unknown)[] | [false, string]; //Fix in TS 3.0: [true, ...unknown[]] | [false, string]
+	export function resume(co: Lua.Thread, ...args: unknown[]): (true | unknown)[] | [false, string]; //Fix in TS 3.0: [true, ...unknown[]] | [false, string]
 
 	/**
 	* Returns the running coroutine, or nil when called by the main thread.
 	*/
-	export function running(): thread | null;
+	export function running(): Lua.Thread | null;
 
 	/**
 	* Returns the status of coroutine co, as a string: "running", if the coroutine is running (that is, it called status); "suspended", if the coroutine is suspended in a call to yield, or if it has not started running yet; "normal" if the coroutine is active but not running (that is, it has resumed another coroutine); and "dead" if the coroutine has finished its body function, or if it has stopped with an error.
 	*/
-	export function status(co: thread): "running" | "suspended" | "normal" | "dead";
+	export function status(co: Lua.Thread): "running" | "suspended" | "normal" | "dead";
 
 	/**
 	* Creates a new coroutine, with body f. f must be a Lua function. Returns a function that resumes the coroutine each time it is called. Any arguments passed to the function behave as the extra arguments to resume. Returns the same values returned by resume, except the first boolean. In case of error, propagates the error.
@@ -341,8 +310,6 @@ declare namespace coroutine
 	*/
 	export function yield(...args: unknown[]): unknown[];
 }
-
-//Module
 
 /**
 * Creates a module. If there is a table in package.loaded[name], this table is the module. Otherwise, if there is a global table t with the given name, this table is the module. Otherwise creates a new table t and sets it as the value of the global name and the value of package.loaded[name]. This function also initializes t._NAME with the given name, t._M with the module (t itself), and t._PACKAGE with the package name (the full module name minus last component; see below). Finally, module sets t as the new environment of the current function and the new value of package.loaded[name], so that require returns t.
@@ -1014,7 +981,7 @@ declare namespace debug
 	/**
 	* Returns the current hook settings of the thread, as three values: the current hook function, the current hook mask, and the current hook count (as set by the debug.sethook function).
 	*/
-	export function gethook(thread?: thread): [null, 0] | [Hook, number, string | null];
+	export function gethook(thread?: Lua.Thread): [null, 0] | [Hook, number, string | null];
 
 	/**
 	* Returns a table with information about a function. You can give the function directly, or you can give a number as the value of function, which means the function running at level function of the call stack of the given thread: level 0 is the current function (getinfo itself); level 1 is the function that called getinfo; and so on. If function is a number larger than the number of active functions, then getinfo returns nil.
@@ -1023,7 +990,7 @@ declare namespace debug
 	*
 	* For instance, the expression debug.getinfo(1,"n").name returns a table with a name for the current function, if a reasonable name can be found, and the expression debug.getinfo(print) returns a table with all available information about the print function.
 	*/
-	export function getinfo(thread: thread, func: Function | number, what?: string): Info;
+	export function getinfo(thread: Lua.Thread, func: Function | number, what?: string): Info;
 	export function getinfo(func: Function | number, what?: string): Info;
 
 	/**
@@ -1033,7 +1000,7 @@ declare namespace debug
 	*
 	* !TupleReturn
 	*/
-	export function getlocal(thread: thread, level: number, local: number): [string, unknown] | [null];
+	export function getlocal(thread: Lua.Thread, level: number, local: number): [string, unknown] | [null];
 	/** !TupleReturn */
 	export function getlocal(level: number, local: number): [string, unknown] | [null];
 
@@ -1070,14 +1037,14 @@ declare namespace debug
 	*
 	* When the hook is called, its first parameter is a string describing the event that has triggered its call: "call", "return" (or "tail return", when simulating a return from a tail call), "line", and "count". For line events, the hook also gets the new line number as its second parameter. Inside a hook, you can call getinfo with level 2 to get more information about the running function (level 0 is the getinfo function, and level 1 is the hook function), unless the event is "tail return". In this case, Lua is only simulating the return, and a call to getinfo will return invalid data.
 	*/
-	export function sethook(thread: thread, hook: Hook, mask: string, count?: number): void;
+	export function sethook(thread: Lua.Thread, hook: Hook, mask: string, count?: number): void;
 	export function sethook(hook: Hook, mask: string, count?: number): void;
 	export function sethook(): void;
 
 	/**
 	* This function assigns the value value to the local variable with index local of the function at level level of the stack. The function returns nil if there is no local variable with the given index, and raises an error when called with a level out of range. (You can call getinfo to check whether the level is valid.) Otherwise, it returns the name of the local variable.
 	*/
-	export function setlocal(thread: thread, level: number, local: number, value: unknown): string | null;
+	export function setlocal(thread: Lua.Thread, level: number, local: number, value: unknown): string | null;
 	export function setlocal(level: number, local: number, value: unknown): string | null;
 
 	/**
@@ -1093,6 +1060,6 @@ declare namespace debug
 	/**
 	* Returns a string with a traceback of the call stack. An optional message string is appended at the beginning of the traceback. An optional level number tells at which level to start the traceback (default is 1, the function calling traceback).
 	*/
-	export function traceback(thread: thread, message: string, level?: number): string;
+	export function traceback(thread: Lua.Thread, message: string, level?: number): string;
 	export function traceback(message: string, level?: number): string;
 }
