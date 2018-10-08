@@ -98,7 +98,7 @@ declare const _G:
 /**
 * Returns the current environment in use by the function. f can be a Lua function or a number that specifies the function at that stack level: Level 1 is the function calling getfenv. If the given function is not a Lua function, or if f is 0, getfenv returns the global environment. The default for f is 1.
 */
-declare function getfenv(f?: Function | number): unknown;
+declare function getfenv(f?: Function | number): Object;
 
 /**
 * If object does not have a metatable, returns nil. Otherwise, if the object's metatable has a "__metatable" field, returns the associated value. Otherwise, returns the metatable of the given object.
@@ -455,7 +455,7 @@ declare namespace string
 	* For this function, a '^' at the start of a pattern does not work as an anchor, as this would prevent the iteration.
 	*/
 	export function gmatch(s: string, pattern: string):
-		/** !TupleReturn */ () => string[] | [null];
+	/** !TupleReturn */ () => string[] | [null];
 
 	/**
 	* Returns a copy of s in which all (or the first n, if given) occurrences of the pattern have been replaced by a replacement string specified by repl, which can be a string, a table, or a function. gsub also returns, as its second value, the total number of matches that occurred.
@@ -771,6 +771,13 @@ declare namespace io
 	}
 
 	/**
+	* The table io also provides three predefined file descriptors with their usual meanings from C: io.stdin, io.stdout, and io.stderr. The I/O library never closes these files.
+	*/
+	export let stdin: File;
+	export let stdout: File;
+	export let stderr: File;
+
+	/**
 	* Equivalent to file:close(). Without a file, closes the default output file.
 	*/
 	export function close(file?: File): void;
@@ -1000,9 +1007,9 @@ declare namespace debug
 	*
 	* !TupleReturn
 	*/
-	export function getlocal(thread: Lua.Thread, level: number, local: number): [string, unknown] | [null];
+	export function getlocal(thread: Lua.Thread, level: number, local: number): [string, unknown] | [null, null];
 	/** !TupleReturn */
-	export function getlocal(level: number, local: number): [string, unknown] | [null];
+	export function getlocal(level: number, local: number): [string, unknown] | [null, null];
 
 	/**
 	* Returns the metatable of the given object or nil if it does not have a metatable.
@@ -1016,8 +1023,10 @@ declare namespace debug
 
 	/**
 	* This function returns the name and the value of the upvalue with index up of the function func. The function returns nil if there is no upvalue with the given index.
+	*
+	* !TupleReturn
 	*/
-	export function getupvalue(func: Function, up: number): [string, unknown] | [null];
+	export function getupvalue(func: Function, up: number): [string, unknown] | [null, null];
 
 	/**
 	* Sets the environment of the given object to the given table. Returns object.
@@ -1060,6 +1069,6 @@ declare namespace debug
 	/**
 	* Returns a string with a traceback of the call stack. An optional message string is appended at the beginning of the traceback. An optional level number tells at which level to start the traceback (default is 1, the function calling traceback).
 	*/
-	export function traceback(thread: Lua.Thread, message: string, level?: number): string;
-	export function traceback(message: string, level?: number): string;
+	export function traceback(thread: Lua.Thread, message?: string, level?: number): string;
+	export function traceback(message?: string, level?: number): string;
 }
