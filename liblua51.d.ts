@@ -55,7 +55,7 @@ declare namespace Lua
 /**
 * Issues an error when the value of its argument v is false (i.e., nil or false); otherwise, returns all its arguments. message is an error message; when absent, it defaults to "assertion failed!"
 */
-declare function assert<T>(v: T | null | false | undefined, message?: string): T;
+declare function assert<T>(v: T | null | false | undefined, message?: string | null): T;
 
 /**
 * This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
@@ -65,8 +65,8 @@ declare function assert<T>(v: T | null | false | undefined, message?: string): T
 * "restart": restarts the garbage collector.
 * "count": returns the total memory in use by Lua (in Kbytes).
 * "step": performs a garbage-collection step. The step "size" is controlled by arg (larger values mean more steps) in a non-specified way. If you want to control the step size you must experimentally tune the value of arg. Returns true if the step finished a collection cycle.
-* "setpause": sets arg as the new value for the pause of the collector (see §2.10). Returns the previous value for pause.
-* "setstepmul": sets arg as the new value for the step multiplier of the collector (see §2.10). Returns the previous value for step.
+* "setpause": sets arg as the new value for the pause of the collector (see 2.10). Returns the previous value for pause.
+* "setstepmul": sets arg as the new value for the step multiplier of the collector (see 2.10). Returns the previous value for step.
 */
 declare function collectgarbage(): void;
 declare function collectgarbage(opt: "collect" | "stop" | "restart"): void;
@@ -110,7 +110,7 @@ declare function getmetatable(obj: Object): unknown;
 *
 * for i,v in ipairs(t) do body end
 *
-* will iterate over the pairs (1,t[1]), (2,t[2]), ···, up to the first integer key absent from the table.
+* will iterate over the pairs (1,t[1]), (2,t[2]), ..., up to the first integer key absent from the table.
 *
 * !TupleReturn
 */
@@ -229,7 +229,7 @@ declare function setmetatable<T extends Object>(t: T, metatable?: Object): T;
 /**
 * Tries to convert its argument to a number. If the argument is already a number or a string convertible to a number, then tonumber returns this number; otherwise, it returns nil.
 *
-* An optional argument specifies the base to interpret the numeral. The base may be any integer between 2 and 36, inclusive. In bases above 10, the letter 'A' (in either upper or lower case) represents 10, 'B' represents 11, and so forth, with 'Z' representing 35. In base 10 (the default), the number can have a decimal part, as well as an optional exponent part (see §2.1). In other bases, only unsigned integers are accepted.
+* An optional argument specifies the base to interpret the numeral. The base may be any integer between 2 and 36, inclusive. In bases above 10, the letter 'A' (in either upper or lower case) represents 10, 'B' represents 11, and so forth, with 'Z' representing 35. In base 10 (the default), the number can have a decimal part, as well as an optional exponent part (see 2.1). In other bases, only unsigned integers are accepted.
 */
 declare function tonumber(e: unknown, base?: number | string): number | null;
 
@@ -248,9 +248,9 @@ declare function type(v: unknown): Lua.TypeName;
 /**
 * Returns the elements from the given table. This function is equivalent to
 *
-* return list[i], list[i+1], ···, list[j]
+* return list[i], list[i+1], ..., list[j]
 *
-* except that the above code can be written only for a fixed number of elements. By default, i is 1 and j is the length of the list, as defined by the length operator (see §2.5.5).
+* except that the above code can be written only for a fixed number of elements. By default, i is 1 and j is the length of the list, as defined by the length operator (see 2.5.5).
 *
 * !TupleReturn
 */
@@ -278,7 +278,7 @@ declare namespace coroutine
 	export function create(f: Function): Lua.Thread;
 
 	/**
-	* Starts or continues the execution of coroutine co. The first time you resume a coroutine, it starts running its body. The values val1, ··· are passed as the arguments to the body function. If the coroutine has yielded, resume restarts it; the values val1, ··· are passed as the results from the yield.
+	* Starts or continues the execution of coroutine co. The first time you resume a coroutine, it starts running its body. The values val1, ... are passed as the arguments to the body function. If the coroutine has yielded, resume restarts it; the values val1, ... are passed as the results from the yield.
 	*
 	* If the coroutine runs without any errors, resume returns true plus any values passed to yield (if the coroutine yields) or any values returned by the body function (if the coroutine terminates). If there is any error, resume returns false plus the error message.
 	*
@@ -411,7 +411,7 @@ declare namespace package
 declare namespace string
 {
 	/**
-	* Returns the internal numerical codes of the characters s[i], s[i+1], ···, s[j]. The default value for i is 1; the default value for j is i.
+	* Returns the internal numerical codes of the characters s[i], s[i+1], ..., s[j]. The default value for i is 1; the default value for j is i.
 	*
 	* Note that numerical codes are not necessarily portable across platforms.
 	*
@@ -455,7 +455,7 @@ declare namespace string
 	* For this function, a '^' at the start of a pattern does not work as an anchor, as this would prevent the iteration.
 	*/
 	export function gmatch(s: string, pattern: string):
-	/** !TupleReturn */ () => string[] | [null];
+		/** !TupleReturn */ () => string[] | [null];
 
 	/**
 	* Returns a copy of s in which all (or the first n, if given) occurrences of the pattern have been replaced by a replacement string specified by repl, which can be a string, a table, or a function. gsub also returns, as its second value, the total number of matches that occurred.
@@ -513,12 +513,12 @@ declare namespace string
 declare namespace table
 {
 	/**
-	* Given an array where all elements are strings or numbers, returns table[i]..sep..table[i+1] ··· sep..table[j]. The default value for sep is the empty string, the default for i is 1, and the default for j is the length of the table. If i is greater than j, returns the empty string.
+	* Given an array where all elements are strings or numbers, returns table[i]..sep..table[i+1] ... sep..table[j]. The default value for sep is the empty string, the default for i is 1, and the default for j is the length of the table. If i is greater than j, returns the empty string.
 	*/
 	export function concat(t: (string | number)[], sep?: string, i?: number, j?: number): string;
 
 	/**
-	* Inserts element value at position pos in table, shifting up other elements to open space, if necessary. The default value for pos is n+1, where n is the length of the table (see §2.5.5), so that a call table.insert(t,x) inserts x at the end of table t.
+	* Inserts element value at position pos in table, shifting up other elements to open space, if necessary. The default value for pos is n+1, where n is the length of the table (see 2.5.5), so that a call table.insert(t,x) inserts x at the end of table t.
 	*/
 	export function insert<T>(t: T[], pos: number, value: T): void;
 	export function insert<T>(t: T[], value: T): void;
@@ -736,7 +736,11 @@ declare namespace io
 		*
 		* !TupleReturn
 		*/
-		read(...args: ("*n" | "*a" | "*l" | number)[]): (string | number | null)[];
+		read(fmt?: "*l"): [string] | [null];
+		read(fmt: "*n"): [number];
+		read(fmt: "*a"): [string];
+		read(fmt: number): [string] | [null];
+		read(fmt1: ("*n" | "*a" | "*l" | number), fmt2: ("*n" | "*a" | "*l" | number), ...fmts: ("*n" | "*a" | "*l" | number)[]): (string | number | null)[];
 
 		/**
 		* Sets and gets the file position, measured from the beginning of the file, to the position given by offset plus a base specified by the string whence, as follows:
@@ -1017,7 +1021,7 @@ declare namespace debug
 	export function getmetatable(obj: Object): Object | null;
 
 	/**
-	* Returns the registry table (see §3.5).
+	* Returns the registry table (see 3.5).
 	*/
 	export function getregistry(): Object;
 

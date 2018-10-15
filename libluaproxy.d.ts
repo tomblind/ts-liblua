@@ -25,15 +25,46 @@
 *
 * To do this, specify compilerOptions.lib as an empty array in tsconfig.json and include this file.
 */
+interface SymbolConstructor
+{
+	readonly iterator: symbol;
+}
+
+declare var Symbol: SymbolConstructor;
+
+interface IteratorResult<T>
+{
+	done: boolean;
+	value: T;
+}
+
+interface Iterator<T>
+{
+	next(value?: any): IteratorResult<T>;
+	return?(value?: any): IteratorResult<T>;
+	throw?(e?: any): IteratorResult<T>;
+}
+
+interface IterableIterator<T> extends Iterator<T>
+{
+	[Symbol.iterator](): IterableIterator<T>;
+}
+
+interface Iterable<T>
+{
+	[Symbol.iterator](): Iterator<T>;
+}
 
 declare interface Array<T>
 {
+	[Symbol.iterator](): IterableIterator<T>;
 	[index: number]: T;
 	readonly length: number;
 }
 
 declare interface String
 {
+	[index: number]: string;
 	readonly length: number;
 }
 
