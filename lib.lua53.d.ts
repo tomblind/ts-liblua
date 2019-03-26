@@ -1198,12 +1198,14 @@ declare namespace io {
 
     export type FileReadFormat = "n" | "a" | "l" | "L" | number;
     
+    export type FileReadFormatType<F extends FileReadFormat> = F extends "n" ? number : string;
+    
     export type FileReadFormatTypeTuple<A extends FileReadFormat[]> = {
-        [I in keyof A]: A[I] extends "*n" ? number : string
+        [I in keyof A]: A[I] extends "n" ? number : string
     };
     
     /** @luaIterator */
-    export interface FileLinesIterable<F extends FileReadFormat> extends Array<FileReadType<F>> {}
+    export interface FileLinesIterable<F extends FileReadFormat> extends Array<FileReadFormatType<F>> {}
     
     /** @luaIterator @tupleReturn */
     export interface FileLinesTupleIterable<A extends FileReadFormat[]> extends Array<FileReadFormatTypeTuple<A>> {}

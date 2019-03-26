@@ -1068,7 +1068,7 @@ declare namespace io {
     export type FileReadFormatType<F extends FileReadFormat> = F extends "*n" ? number : string;
     
     export type FileReadFormatTypeTuple<A extends FileReadFormat[]> = {
-        [I in keyof A]: FileReadFormatType<A[I]>
+        [I in keyof A]: A[I] extends "*n" ? number : string
     };
 
     /**
