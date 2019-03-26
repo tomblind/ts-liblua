@@ -21,7 +21,7 @@
 //SOFTWARE.
 
 interface Array<T> {
-	length: number;
+    length: number;
     [n: number]: T;
     [Symbol.iterator]: any;
 }

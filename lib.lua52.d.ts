@@ -372,28 +372,28 @@ declare function select<A extends unknown[]>(this: void, index: number, ...args:
 declare function select(this: void, index: "#", ...args: unknown[]): [number];
 
 declare interface LuaNewIndexMetaMethod<K extends string, V> {
-	__newindex(this: unknown, key: K, value: V): void;
+    __newindex(this: unknown, key: K, value: V): void;
 }
 
 declare interface LuaIndexMetaMethod<K extends string, V> {
-	__index(this: unknown, key: K): V;
+    __index(this: unknown, key: K): V;
 }
 
 declare interface LuaIndexMetaTable<T> {
-	__index: T;
+    __index: T;
 }
 
 type LuaIndexMeta<M> = M extends LuaIndexMetaMethod<infer K, infer V>
-	? { [I in K]: V }
-	: M extends LuaIndexMetaTable<infer T> ? T : {};
+    ? { [I in K]: V }
+    : M extends LuaIndexMetaTable<infer T> ? T : {};
 
 type LuaMetaExtractReadonly<I, E> = {
-	+readonly [K in Exclude<keyof I, E>]: I[K]
+    +readonly [K in Exclude<keyof I, E>]: I[K]
 };
 
 type LuaMeta<M> = M extends LuaNewIndexMetaMethod<infer K, infer V>
-	? { [I in K]: V } & LuaMetaExtractReadonly<LuaIndexMeta<M>, K>
-	: LuaIndexMeta<M>;
+    ? { [I in K]: V } & LuaMetaExtractReadonly<LuaIndexMeta<M>, K>
+    : LuaIndexMeta<M>;
 
 /**
  * Sets the metatable for the given table. (You cannot change the metatable of other types from Lua, only from C.) If
@@ -1236,7 +1236,7 @@ declare namespace io {
     export type FileReadFormatType<F extends FileReadFormat> = F extends "*n" ? number : string;
     
     export type FileReadFormatTypeTuple<A extends FileReadFormat[]> = {
-    	[I in keyof A]: A[I] extends "*n" ? number : string
+        [I in keyof A]: A[I] extends "*n" ? number : string
     };
     
     /** @luaIterator */
@@ -1475,21 +1475,21 @@ declare namespace os {
     export function clock(this: void): number;
 
     export interface Time {
-    	year: number;
-    	month: number;
-    	day: number;
-    	hour?: number;
-    	min?: number;
-    	sec?: number;
-    	isdst?: boolean;
+        year: number;
+        month: number;
+        day: number;
+        hour?: number;
+        min?: number;
+        sec?: number;
+        isdst?: boolean;
     }
     
     export interface Date extends Time {
-    	hour: number;
-    	min: number;
-    	sec: number;
-    	wday: number;
-    	yday: number;
+        hour: number;
+        min: number;
+        sec: number;
+        wday: number;
+        yday: number;
     }
 
     /**
@@ -1667,20 +1667,20 @@ declare namespace debug {
     export function gethook(this: void, thread?: LuaThread): [Hook, string, number];
 
     export interface FunctionInfo {
-    	name?: string;
-    	namewhat?: "global" | "local" | "method" | "field" | "upvalue" | "";
-    	what?: "Lua" | "C" | "main";
-    	source?: string;
-    	currentline?: number;
-    	linedefined?: number;
-    	lastlinedefined?: number;
-    	nups?: number;
-    	nparams?: number;
-    	isvararg?: boolean;
-    	istailcall?: boolean;
-    	short_src?: string;
-    	func?: Function;
-    	activelines?: number[];
+        name?: string;
+        namewhat?: "global" | "local" | "method" | "field" | "upvalue" | "";
+        what?: "Lua" | "C" | "main";
+        source?: string;
+        currentline?: number;
+        linedefined?: number;
+        lastlinedefined?: number;
+        nups?: number;
+        nparams?: number;
+        isvararg?: boolean;
+        istailcall?: boolean;
+        short_src?: string;
+        func?: Function;
+        activelines?: number[];
     }
 
     /**
