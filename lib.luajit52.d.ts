@@ -313,7 +313,7 @@ declare function select<A extends unknown[]>(this: void, index: number, ...args:
  * If `index` is a number, returns all arguments after argument number `index`. Otherwise, `index` must be the string
  *   `"#"`, and `select` returns the total number of extra arguments it received.
 */
-declare function select(this: void, index: "#", ...args: unknown[]): [number];
+declare function select(this: void, index: "#", ...args: unknown[]): number;
 
 /**
  * Sets the environment to be used by the given function. `f` can be a Lua function or a number that specifies the
