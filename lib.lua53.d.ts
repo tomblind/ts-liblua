@@ -1101,7 +1101,7 @@ declare namespace math {
     /**
      * An integer with the maximum value for an integer.
     */
-    export const maxinteger: unknown;
+    export const maxinteger: number;
 
     /**
      * Returns the argument with the minimum value, according to the Lua operator `<;`. (integer/float)
