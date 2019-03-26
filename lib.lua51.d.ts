@@ -1060,6 +1060,7 @@ declare namespace io {
      *
      * This function is system dependent and is not available on all platforms.
     */
+    /** @tupleReturn */
     export function popen(this: void, prog: string, mode?: "r" | "w"): [LuaFile] | [undefined, string];
 
     export type FileReadFormat = "*n" | "*a" | "*l" | number;

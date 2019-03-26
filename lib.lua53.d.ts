@@ -1273,6 +1273,7 @@ declare namespace io {
      * Starts program `prog` in a separated process and returns a file handle that you can use to read data from this
      *   program (if `mode` is `"r"`, the default) or to write data to this program (if `mode` is `"w"`).
     */
+    /** @tupleReturn */
     export function popen(this: void, prog: string, mode?: "r" | "w"): [LuaFile] | [undefined, string];
 
     /**
