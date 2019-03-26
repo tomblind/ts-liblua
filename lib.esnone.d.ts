@@ -23,6 +23,7 @@
 interface Array<T> {
 	length: number;
     [n: number]: T;
+    [Symbol.iterator]: any;
 }
 
 interface Boolean {}
@@ -40,6 +41,12 @@ interface Number {}
 interface Object {}
 
 interface RegExp {}
+
+interface Symbol {}
+
+declare const Symbol: {
+    readonly iterator: symbol;
+};
 
 type Exclude<T, U> = T extends U ? never : T;
 
