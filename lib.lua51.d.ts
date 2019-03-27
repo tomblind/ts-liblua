@@ -29,6 +29,12 @@ declare interface LuaLightUserData { readonly ____luaLightUserData: never; }
  * Issues an error when the value of its argument `v` is false (i.e., nil or false); otherwise, returns all its
  *   arguments. `message` is an error message; when absent, it defaults to "assertion failed!"
 */
+declare function assert<V>(this: void, v: V): Exclude<V, undefined | null | false>;
+
+/**
+ * Issues an error when the value of its argument `v` is false (i.e., nil or false); otherwise, returns all its
+ *   arguments. `message` is an error message; when absent, it defaults to "assertion failed!"
+*/
 /** @tupleReturn */
 declare function assert<V extends [unknown, ...unknown[]]>(
     this: void,
