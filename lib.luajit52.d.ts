@@ -20,7 +20,6 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-declare type LuaTable<T> = T extends object ? (T extends Function ? never : T) : never;
 declare interface LuaThread { readonly ____luaThread: never; }
 declare interface LuaUserData { readonly ____luaUserData: never; }
 declare interface LuaLightUserData { readonly ____luaLightUserData: never; }
@@ -239,7 +238,7 @@ declare function loadstring(
  *   table. You may however modify existing fields. In particular, you may clear existing fields.
 */
 /** @tupleReturn */
-declare function next<T>(this: void, table: LuaTable<T>, index?: keyof T): [keyof T, T[keyof T]];
+declare function next<T extends object>(this: void, table: T, index?: keyof T): [keyof T, T[keyof T]];
 
 /** @luaIterator @tupleReturn */
 declare interface LuaPairsIterable<T> extends Array<[keyof T, T[keyof T]]> {}
@@ -255,7 +254,7 @@ declare interface LuaPairsIterable<T> extends Array<[keyof T, T[keyof T]]> {}
  *
  * See function `next` for the caveats of modifying the table during its traversal.
 */
-declare function pairs<T>(this: void, t: LuaTable<T>): LuaPairsIterable<T>;
+declare function pairs<T extends object>(this: void, t: T): LuaPairsIterable<T>;
 
 /**
  * Calls function `f` with the given arguments in protected mode. This means that any error inside `f` is not
@@ -300,13 +299,13 @@ declare function rawequal(this: void, v1: unknown, v2: unknown): boolean;
  * Gets the real value of `table[index]`, without invoking any metamethod. `table` must be a table; `index` may be any
  *   value.
 */
-declare function rawget<T, I extends keyof T>(this: void, table: LuaTable<T>, index: I): T[I];
+declare function rawget<T extends object, I extends keyof T>(this: void, table: T, index: I): T[I];
 
 /**
  * Sets the real value of `table[index]` to `value`, without invoking any metamethod. `table` must be a table, `index`
  *   any value different from nil, and `value` any Lua value. This function returns `table`.
 */
-declare function rawset<T, I extends keyof T>(this: void, table: LuaTable<T>, index: I, value: T[I]): void;
+declare function rawset<T extends object, I extends keyof T>(this: void, table: T, index: I, value: T[I]): void;
 
 /**
  * If `index` is a number, returns all arguments after argument number `index`. Otherwise, `index` must be the string
@@ -328,7 +327,7 @@ declare function select(this: void, index: "#", ...args: unknown[]): number;
  * As a special case, when `f` is 0 `setfenv` changes the environment of the running thread. In this case, `setfenv`
  *   returns no values.
 */
-declare function setfenv<T>(this: void, f: 0, table: LuaTable<T>): void;
+declare function setfenv<T extends object>(this: void, f: 0, table: T): void;
 
 /**
  * Sets the environment to be used by the given function. `f` can be a Lua function or a number that specifies the
@@ -337,7 +336,7 @@ declare function setfenv<T>(this: void, f: 0, table: LuaTable<T>): void;
  * As a special case, when `f` is 0 `setfenv` changes the environment of the running thread. In this case, `setfenv`
  *   returns no values.
 */
-declare function setfenv<T>(this: void, f: Function | number, table: LuaTable<T>): Function | undefined;
+declare function setfenv<T extends object>(this: void, f: Function | number, table: T): Function | undefined;
 
 declare interface LuaNewIndexMetaMethod<K extends string, V> {
     __newindex(this: unknown, key: K, value: V): void;
@@ -370,7 +369,7 @@ type LuaMeta<M> = M extends LuaNewIndexMetaMethod<infer K, infer V>
  *
  * This function returns `table`.
 */
-declare function setmetatable<T, M>(this: void, table: LuaTable<T>, metatable?: LuaTable<M>): T & LuaMeta<M>;
+declare function setmetatable<T extends object, M extends object>(this: void, table: T, metatable?: M): T & LuaMeta<M>;
 
 /**
  * Tries to convert its argument to a number. If the argument is already a number or a string convertible to a number,
@@ -897,7 +896,7 @@ declare namespace table {
      * Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical
      *   indices. (To do its job this function does a linear traversal of the whole table.)
     */
-    export function maxn<T>(this: void, table: LuaTable<T>): number;
+    export function maxn<T extends object>(this: void, table: T): number;
 
     /**
      * Returns a new table with all parameters stored into keys 1, 2, etc. and with a field "`n`" with the total number
@@ -1666,7 +1665,7 @@ declare namespace debug {
     /**
      * Sets the environment of the given `object` to the given `table`. Returns `object`.
     */
-    export function setfenv<O, T>(this: void, o: O, table: LuaTable<T>): O;
+    export function setfenv<O, T extends object>(this: void, o: O, table: T): O;
 
     /**
      * Sets the given function as a hook. The string `mask` and the number `count` describe when the hook will be
@@ -1757,7 +1756,7 @@ declare namespace debug {
     /**
      * Sets the metatable for the given `value` to the given `table` (which can be nil). Returns `value`.
     */
-    export function setmetatable<V, M>(this: void, value: V, table?: LuaTable<M>): V & LuaMeta<M>;
+    export function setmetatable<V, M extends object>(this: void, value: V, table?: M): V & LuaMeta<M>;
 
     /**
      * This function assigns the value `value` to the upvalue with index `up` of the function `f`. The function returns
@@ -1771,7 +1770,7 @@ declare namespace debug {
      *
      * Returns `udata`.
     */
-    export function setuservalue<T>(this: void, udata: LuaUserData, value?: LuaTable<T>): LuaUserData;
+    export function setuservalue<T extends object>(this: void, udata: LuaUserData, value?: T): LuaUserData;
 
     /**
      * Returns a string with a traceback of the call stack. An optional `message` string is appended at the beginning of
@@ -2265,7 +2264,7 @@ declare interface Ffi {
      *   metamethod only applies to struct/union types and performs an implicit ffi.gc() call during creation of an
      *   instance.
     */
-    metatype<M>(this: void, ct: Ffi.ct, metatable: LuaTable<M>): Ffi.ctype & LuaMeta<M>;
+    metatype<M extends object>(this: void, ct: Ffi.ct, metatable: M): Ffi.ctype & LuaMeta<M>;
 
     /**
      * Associates a finalizer with a pointer or aggregate cdata object. The cdata object is returned unchanged.

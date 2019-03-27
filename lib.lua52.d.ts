@@ -20,7 +20,6 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-declare type LuaTable<T> = T extends object ? (T extends Function ? never : T) : never;
 declare interface LuaThread { readonly ____luaThread: never; }
 declare interface LuaUserData { readonly ____luaUserData: never; }
 declare interface LuaLightUserData { readonly ____luaLightUserData: never; }
@@ -287,7 +286,7 @@ declare function loadfile(
  *   table. You may however modify existing fields. In particular, you may clear existing fields.
 */
 /** @tupleReturn */
-declare function next<T>(this: void, table: LuaTable<T>, index?: keyof T): [keyof T, T[keyof T]];
+declare function next<T extends object>(this: void, table: T, index?: keyof T): [keyof T, T[keyof T]];
 
 /** @luaIterator @tupleReturn */
 declare interface LuaPairsIterable<T> extends Array<[keyof T, T[keyof T]]> {}
@@ -303,7 +302,7 @@ declare interface LuaPairsIterable<T> extends Array<[keyof T, T[keyof T]]> {}
  *
  * See function `next` for the caveats of modifying the table during its traversal.
 */
-declare function pairs<T>(this: void, t: LuaTable<T>): LuaPairsIterable<T>;
+declare function pairs<T extends object>(this: void, t: T): LuaPairsIterable<T>;
 
 /**
  * Calls function `f` with the given arguments in protected mode. This means that any error inside `f` is not
@@ -348,19 +347,19 @@ declare function rawequal(this: void, v1: unknown, v2: unknown): boolean;
  * Gets the real value of `table[index]`, without invoking any metamethod. `table` must be a table; `index` may be any
  *   value.
 */
-declare function rawget<T, I extends keyof T>(this: void, table: LuaTable<T>, index: I): T[I];
+declare function rawget<T extends object, I extends keyof T>(this: void, table: T, index: I): T[I];
 
 /**
  * Returns the length of the object `v`, which must be a table or a string, without invoking any metamethod. Returns an
  *   integer number.
 */
-declare function rawlen<T>(this: void, v: LuaTable<T> | string): number;
+declare function rawlen<T extends object>(this: void, v: T | string): number;
 
 /**
  * Sets the real value of `table[index]` to `value`, without invoking any metamethod. `table` must be a table, `index`
  *   any value different from nil and NaN, and `value` any Lua value. This function returns `table`.
 */
-declare function rawset<T, I extends keyof T>(this: void, table: LuaTable<T>, index: I, value: T[I]): void;
+declare function rawset<T extends object, I extends keyof T>(this: void, table: T, index: I, value: T[I]): void;
 
 /**
  * If `index` is a number, returns all arguments after argument number `index`; a negative number indexes from the end
@@ -408,7 +407,7 @@ type LuaMeta<M> = M extends LuaNewIndexMetaMethod<infer K, infer V>
  *
  * This function returns `table`.
 */
-declare function setmetatable<T, M>(this: void, table: LuaTable<T>, metatable?: LuaTable<M>): T & LuaMeta<M>;
+declare function setmetatable<T extends object, M extends object>(this: void, table: T, metatable?: M): T & LuaMeta<M>;
 
 /**
  * When called with no `base`, `tonumber` tries to convert its argument to a number. If the argument is already a number
@@ -1878,7 +1877,7 @@ declare namespace debug {
     /**
      * Sets the metatable for the given `value` to the given `table` (which can be nil). Returns `value`.
     */
-    export function setmetatable<V, M>(this: void, value: V, table?: LuaTable<M>): V & LuaMeta<M>;
+    export function setmetatable<V, M extends object>(this: void, value: V, table?: M): V & LuaMeta<M>;
 
     /**
      * This function assigns the value `value` to the upvalue with index `up` of the function `f`. The function returns
@@ -1892,7 +1891,7 @@ declare namespace debug {
      *
      * Returns `udata`.
     */
-    export function setuservalue<T>(this: void, udata: LuaUserData, value?: LuaTable<T>): LuaUserData;
+    export function setuservalue<T extends object>(this: void, udata: LuaUserData, value?: T): LuaUserData;
 
     /**
      * If `message` is present but is neither a string nor nil, this function returns `message` without further
