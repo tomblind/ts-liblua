@@ -42,6 +42,10 @@ interface Object {}
 
 interface RegExp {}
 
+interface String {
+    readonly length: number;
+}
+
 interface Symbol {}
 
 declare const Symbol: {
