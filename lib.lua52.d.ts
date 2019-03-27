@@ -1330,6 +1330,12 @@ declare namespace io {
     /** @tupleReturn */
     export function read<A extends FileReadFormat[]>(this: void, ...formats: A): FileReadFormatTypeTuple<A>;
 
+    export const stderr: LuaFile;
+
+    export const stdin: LuaFile;
+
+    export const stdout: LuaFile;
+
     /**
      * Returns a handle for a temporary file. This file is opened in update mode and it is automatically removed when
      *   the program ends.
