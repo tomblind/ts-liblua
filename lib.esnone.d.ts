@@ -20,10 +20,29 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+interface IteratorResult<T> {
+    done: boolean;
+    value: T;
+}
+
+interface Iterator<T> {
+    next(value?: any): IteratorResult<T>;
+    return?(value?: any): IteratorResult<T>;
+    throw?(e?: any): IteratorResult<T>;
+}
+
+interface Iterable<T> {
+    [Symbol.iterator](): Iterator<T>;
+}
+
+interface IterableIterator<T> extends Iterator<T> {
+    [Symbol.iterator](): IterableIterator<T>;
+}
+
 interface Array<T> {
     length: number;
     [n: number]: T;
-    [Symbol.iterator]: any;
+    [Symbol.iterator](): IterableIterator<T>;
 }
 
 interface Boolean {}
