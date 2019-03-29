@@ -161,9 +161,6 @@ declare interface LuaIpairsIterable<T> extends Array<[number, T]> {}
 */
 declare function ipairs<T>(this: void, t: T[]): LuaIpairsIterable<T>;
 
-/** @tupleReturn */
-declare interface LuaLoadFunction { (this: void): unknown[]; }
-
 /**
  * Loads a chunk using function `func` to get its pieces. Each call to `func` must return a string that concatenates
  *   with previous results. A return of an empty string, nil, or no value signals the end of the chunk.
@@ -179,13 +176,13 @@ declare function load(
     this: void,
     func: { (this: void): string | undefined; },
     chunkname?: string
-): [LuaLoadFunction, undefined] | [undefined, string];
+): [{ (this: void): unknown; }, undefined] | [undefined, string];
 
 /**
  * Similar to `load`, but gets the chunk from file `filename` or from the standard input, if no file name is given.
 */
 /** @tupleReturn */
-declare function loadfile(this: void, filename?: string): [LuaLoadFunction, undefined] | [undefined, string];
+declare function loadfile(this: void, filename?: string): [{ (this: void): unknown; }, undefined] | [undefined, string];
 
 /**
  * Similar to `load`, but gets the chunk from the given string.
@@ -201,7 +198,7 @@ declare function loadstring(
     this: void,
     string_?: string,
     chunkname?: string
-): [LuaLoadFunction, undefined] | [undefined, string];
+): [{ (this: void): unknown; }, undefined] | [undefined, string];
 
 /**
  * Allows a program to traverse all fields of a table. Its first argument is a table and its second argument is an index
