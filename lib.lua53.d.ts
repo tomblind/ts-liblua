@@ -411,7 +411,7 @@ declare function tostring(this: void, v: unknown): string;
 declare function type(
     this: void,
     v: unknown
-): "nil" | "number" | "string" | "table" | "function" | "thread" | "userdata";
+): "nil" | "number" | "string" | "boolean" | "table" | "function" | "thread" | "userdata";
 
 /**
  * A global variable (not a function) that holds a string containing the running Lua version. The current value of this

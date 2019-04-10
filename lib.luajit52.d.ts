@@ -403,7 +403,7 @@ declare function tostring(this: void, e: unknown): string;
 declare function type(
     this: void,
     v: unknown
-): "nil" | "number" | "string" | "table" | "function" | "thread" | "userdata" | "cdata";
+): "nil" | "number" | "string" | "boolean" | "table" | "function" | "thread" | "userdata" | "cdata";
 
 /**
  * Returns the elements from the given table. This function is equivalent to
