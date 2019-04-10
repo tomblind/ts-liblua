@@ -134,7 +134,7 @@ declare function error(this: void, message: string, level?: number): never;
  *   this variable; changing its value does not affect any environment, nor vice-versa. (Use `setfenv` to change
  *   environments.)
 */
-declare const _G: Record<string | number | symbol, unknown>;
+declare const _G: { [key: string]: unknown; };
 
 /**
  * Returns the current environment in use by the function. `f` can be a Lua function or a number that specifies the
@@ -393,7 +393,7 @@ declare function tonumber(this: void, e: string, base: number): number | undefin
  *   numbers are converted, use `string.format`. If the metatable of `e` has a `"__tostring"` field, then `tostring`
  *   calls the corresponding value with `e` as argument, and uses the result of the call as its result.
 */
-declare function tostring(this: void, e: unknown): string | undefined;
+declare function tostring(this: void, e: unknown): string;
 
 /**
  * Returns the type of its only argument, coded as a string. The possible results of this function are "`nil`" (a
@@ -494,7 +494,7 @@ declare namespace coroutine {
     export function yield(this: void, ...args: unknown[]): unknown;
 }
 
-declare type LuaModule = { _NAME: string; _M: LuaModule; } & Record<string | number | symbol, unknown>;
+declare type LuaModule = { _NAME: string; _M: LuaModule; } & { [key: string]: unknown; };
 
 /**
  * Creates a module. If there is a table in `package.loaded[name]`, this table is the module. Otherwise, if there is a
@@ -1645,7 +1645,7 @@ declare namespace debug {
     /**
      * Returns the registry table (see 3.5).
     */
-    export function getregistry(this: void): Record<string | number | symbol, unknown>;
+    export function getregistry(this: void): { [key: string]: unknown; };
 
     /**
      * This function returns the name and the value of the upvalue with index `up` of the function `f`. The function

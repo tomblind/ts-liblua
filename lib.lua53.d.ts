@@ -166,7 +166,7 @@ declare function error(this: void, message: string, level?: number): never;
  * A global variable (not a function) that holds the global environment (see 2.2). Lua itself does not use this
  *   variable; changing its value does not affect any environment, nor vice versa.
 */
-declare const _G: Record<string | number | symbol, unknown>;
+declare const _G: { [key: string]: unknown; };
 
 /**
  * If `object` does not have a metatable, returns nil. Otherwise, if the object's metatable has a `__metatable` field,
@@ -401,7 +401,7 @@ declare function tonumber(this: void, e: string, base: number): number | undefin
  *   numbers are converted, use `string.format`.) If the metatable of `v` has a `__tostring` field, then `tostring`
  *   calls the corresponding value with `v` as argument, and uses the result of the call as its result.
 */
-declare function tostring(this: void, v: unknown): string | undefined;
+declare function tostring(this: void, v: unknown): string;
 
 /**
  * Returns the type of its only argument, coded as a string. The possible results of this function are "`nil`" (a
@@ -1758,7 +1758,7 @@ declare namespace debug {
     /**
      * Returns the registry table (see 4.5).
     */
-    export function getregistry(this: void): Record<string | number | symbol, unknown>;
+    export function getregistry(this: void): { [key: string]: unknown; };
 
     /**
      * This function returns the name and the value of the upvalue with index `up` of the function `f`. The function
