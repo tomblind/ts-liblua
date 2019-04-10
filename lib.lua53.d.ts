@@ -851,7 +851,7 @@ declare namespace string {
      *   is 1 and can be negative.
     */
     /** @tupleReturn */
-    export function match(this: void, s: string, pattern: string, init?: number): string[];
+    export function match(this: void, s: string, pattern: string, init?: number): string[] | [undefined];
 
     /**
      * Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form)
@@ -2046,7 +2046,7 @@ declare interface String {
      *   is 1 and can be negative.
     */
     /** @tupleReturn */
-    match(this: this, pattern: string, init?: number): string[];
+    match(this: this, pattern: string, init?: number): string[] | [undefined];
 
     /**
      * Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form)

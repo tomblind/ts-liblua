@@ -839,7 +839,7 @@ declare namespace string {
      *   be negative.
     */
     /** @tupleReturn */
-    export function match(this: void, s: string, pattern: string, init?: number): string[];
+    export function match(this: void, s: string, pattern: string, init?: number): string[] | [undefined];
 
     /**
      * Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`. The
@@ -1934,7 +1934,7 @@ declare interface String {
      *   be negative.
     */
     /** @tupleReturn */
-    match(this: this, pattern: string, init?: number): string[];
+    match(this: this, pattern: string, init?: number): string[] | [undefined];
 
     /**
      * Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`. The
