@@ -2176,7 +2176,21 @@ declare namespace jit {
     export const util: Record<string, any>;
 }
 
-declare interface Ffi {
+declare namespace ffi {
+    export interface cdata {
+        ____ffiCData: never;
+        (...args: unknown[]): unknown;
+        [index: number]: any;
+        [field: string]: any;
+    }
+    
+    export interface ctype {
+        (this: void, nelem?: number, ...init: unknown[]): cdata;
+        ____ffiCType: never;
+    }
+    
+    export type ct = cdata | ctype | string;
+
     /**
      * Adds multiple C declarations for types or external symbols (named variables or functions). def must be a Lua
      *   string. It's recommended to use the syntactic sugar for string arguments as follows:
@@ -2197,7 +2211,7 @@ declare interface Ffi {
      *   files through an external C pre-processor (once). Be careful not to include unneeded or redundant declarations
      *   from unrelated header files.
     */
-    cdef(this: void, def: string): void;
+    export function cdef(this: void, def: string): void;
 
     /**
      * This is the default C library namespace — note the uppercase 'C'. It binds to the default set of symbols or
@@ -2213,7 +2227,7 @@ declare interface Ffi {
      *   LuaJIT itself), the C runtime library LuaJIT was linked with (msvcrt*.dll), kernel32.dll, user32.dll and
      *   gdi32.dll.
     */
-    readonly C: Record<string, any>;
+    export const C: Record<string, any>;
 
     /**
      * This loads the dynamic library given by name and returns a new C library namespace which binds to its symbols. On
@@ -2228,7 +2242,7 @@ declare interface Ffi {
      * On Windows systems, if the name contains no dot, the extension .dll is appended. So ffi.load("ws2_32") looks for
      *   "ws2_32.dll" in the default DLL search path.
     */
-    load(this: void, name: string, global?: boolean): Record<string, any>;
+    export function load(this: void, name: string, global?: boolean): Record<string, any>;
 
     /**
      * Creates a cdata object for the given ct. VLA/VLS types require the nelem argument. The second syntax uses a ctype
@@ -2247,7 +2261,8 @@ declare interface Ffi {
      *   excessive number of traces. It's strongly suggested to either declare a named struct or typedef with ffi.cdef()
      *   or to create a single ctype object for an anonymous struct with ffi.typeof().
     */
-    readonly new: { (this: void, ct: Ffi.ct, nelem?: number, ...init: unknown[]): Ffi.cdata; };
+    function _new(this: void, ct: ffi.ct, nelem?: number, ...init: unknown[]): ffi.cdata;
+    export {_new as new};
 
     /**
      * Creates a ctype object for the given ct.
@@ -2255,7 +2270,8 @@ declare interface Ffi {
      * This function is especially useful to parse a cdecl only once and then use the resulting ctype object as a
      *   constructor.
     */
-    typeof(this: void, ct: Ffi.ct): Ffi.ctype;
+    function _typeof(this: void, ct: ffi.ct): ffi.ctype;
+    export {_typeof as typeof};
 
     /**
      * Creates a scalar cdata object for the given ct. The cdata object is initialized with init using the "cast"
@@ -2264,7 +2280,7 @@ declare interface Ffi {
      * This functions is mainly useful to override the pointer compatibility checks or to convert pointers to addresses
      *   or vice versa.
     */
-    cast(this: void, ct: Ffi.ct, init: unknown): Ffi.cdata;
+    export function cast(this: void, ct: ffi.ct, init: unknown): ffi.cdata;
 
     /**
      * Creates a ctype object for the given ct and associates it with a metatable. Only struct/union types, complex
@@ -2281,7 +2297,7 @@ declare interface Ffi {
      *   metamethod only applies to struct/union types and performs an implicit ffi.gc() call during creation of an
      *   instance.
     */
-    metatype<M extends object>(this: void, ct: Ffi.ct, metatable: M): Ffi.ctype & LuaMeta<M>;
+    export function metatype<M extends object>(this: void, ct: ffi.ct, metatable: M): ffi.ctype & LuaMeta<M>;
 
     /**
      * Associates a finalizer with a pointer or aggregate cdata object. The cdata object is returned unchanged.
@@ -2301,24 +2317,24 @@ declare interface Ffi {
      *
      *     ffi.C.free(ffi.gc(p, nil)) -- Manually free the memory.
     */
-    gc(this: void, cdata: Ffi.cdata, finalizer?: Function): Ffi.cdata;
+    export function gc(this: void, cdata: ffi.cdata, finalizer?: Function): ffi.cdata;
 
     /**
      * Returns the size of ct in bytes. Returns nil if the size is not known (e.g. for "void" or function types).
      *   Requires nelem for VLA/VLS types, except for cdata objects.
     */
-    sizeof(this: void, ct: Ffi.ct, nelem?: number): number;
+    export function sizeof(this: void, ct: ffi.ct, nelem?: number): number;
 
     /**
      * Returns the minimum required alignment for ct in bytes.
     */
-    alignof(this: void, ct: Ffi.ct): number;
+    export function alignof(this: void, ct: ffi.ct): number;
 
     /**
      * Returns the offset (in bytes) of field relative to the start of ct, which must be a struct. Additionally returns
      *   the position and the field size (in bits) for bit fields.
     */
-    offsetof(this: void, ct: Ffi.ct, field: string): number;
+    export function offsetof(this: void, ct: ffi.ct, field: string): number;
 
     /**
      * Returns true if obj has the C type given by ct. Returns false otherwise.
@@ -2330,7 +2346,7 @@ declare interface Ffi {
      * Note: this function accepts all kinds of Lua objects for the obj argument, but always returns false for non-cdata
      *   objects.
     */
-    istype(this: void, ct: Ffi.ct, obj: unknown): boolean;
+    export function istype(this: void, ct: ffi.ct, obj: unknown): boolean;
 
     /**
      * Returns the error number set by the last C function call which indicated an error condition. If the optional
@@ -2345,7 +2361,7 @@ declare interface Ffi {
      *   other internal VM activity. The same applies to the value returned by GetLastError() on Windows, but you need
      *   to declare and call it yourself.
     */
-    errno(this: void, newerr?: number): number;
+    export function errno(this: void, newerr?: number): number;
 
     /**
      * Creates an interned Lua string from the data pointed to by ptr.
@@ -2364,7 +2380,7 @@ declare interface Ffi {
      * Performance notice: it's faster to pass the length of the string, if it's known. E.g. when the length is returned
      *   by a C call like sprintf().
     */
-    string(this: void, ptr: unknown, len?: number): string;
+    export function string(this: void, ptr: unknown, len?: number): string;
 
     /**
      * Copies the data pointed to by src to dst. dst is converted to a "void *" and src is converted to a "const void
@@ -2379,7 +2395,7 @@ declare interface Ffi {
      * Performance notice: ffi.copy() may be used as a faster (inlinable) replacement for the C library functions
      *   memcpy(), strcpy() and strncpy().
     */
-    copy(this: void, dst: unknown, src: unknown, len: number): void;
+    export function copy(this: void, dst: unknown, src: unknown, len: number): void;
 
     /**
      * Copies the data pointed to by src to dst. dst is converted to a "void *" and src is converted to a "const void
@@ -2394,7 +2410,7 @@ declare interface Ffi {
      * Performance notice: ffi.copy() may be used as a faster (inlinable) replacement for the C library functions
      *   memcpy(), strcpy() and strncpy().
     */
-    copy(this: void, dst: unknown, str: string): void;
+    export function copy(this: void, dst: unknown, str: string): void;
 
     /**
      * Fills the data pointed to by dst with len constant bytes, given by c. If c is omitted, the data is zero-filled.
@@ -2402,7 +2418,7 @@ declare interface Ffi {
      * Performance notice: ffi.fill() may be used as a faster (inlinable) replacement for the C library function
      *   memset(dst, c, len). Please note the different order of arguments!
     */
-    fill(this: void, dst: unknown, len: number, c?: string): void;
+    export function fill(this: void, dst: unknown, len: number, c?: string): void;
 
     /**
      * Returns true if param (a Lua string) applies for the target ABI (Application Binary Interface). Returns false
@@ -2420,33 +2436,20 @@ declare interface Ffi {
      *     eabi       EABI variant of the standard ABI
      *     win        Windows variant of the standard ABI
     */
-    abi(this: void, param: "32bit" | "64bit" | "le" | "be" | "fpu" | "softfp" | "hardfp" | "eabi" | "win"): boolean;
+    export function abi(
+        this: void,
+        param: "32bit" | "64bit" | "le" | "be" | "fpu" | "softfp" | "hardfp" | "eabi" | "win"
+    ): boolean;
 
     /**
      * Contains the target OS name. Same contents as jit.os.
     */
-    readonly os: "Windows" | "Linux" | "OSX" | "BSD" | "POSIX" | "Other";
+    export const os: "Windows" | "Linux" | "OSX" | "BSD" | "POSIX" | "Other";
 
     /**
      * Contains the target architecture name. Same contents as jit.arch.
     */
-    readonly arch: "x86" | "x64" | "arm" | "ppc" | "ppcspe" | "mips";
-}
-
-declare namespace Ffi {
-    export interface cdata {
-        ____ffiCData: never;
-        (...args: unknown[]): unknown;
-        [index: number]: any;
-        [field: string]: any;
-    }
-    
-    export interface ctype {
-        (this: void, nelem?: number, ...init: unknown[]): cdata;
-        ____ffiCType: never;
-    }
-    
-    export type ct = cdata | ctype | string;
+    export const arch: "x86" | "x64" | "arm" | "ppc" | "ppcspe" | "mips";
 
     export interface cb extends cdata {
         /**
@@ -2464,6 +2467,3 @@ declare namespace Ffi {
         set(this: this, func: Function): void;
     }
 }
-
-declare const ffi: Ffi;
-
