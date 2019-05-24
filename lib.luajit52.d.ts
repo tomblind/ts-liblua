@@ -134,7 +134,7 @@ declare function error(this: void, message: string, level?: number): never;
  *   this variable; changing its value does not affect any environment, nor vice-versa. (Use `setfenv` to change
  *   environments.)
 */
-declare const _G: { [key: string]: unknown; };
+declare const _G: typeof globalThis & Record<string, unknown>;
 
 /**
  * Returns the current environment in use by the function. `f` can be a Lua function or a number that specifies the

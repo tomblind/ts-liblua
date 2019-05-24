@@ -205,7 +205,7 @@ declare function error(this: void, message: string, level?: number): never;
  * A global variable (not a function) that holds the global environment (see 2.2). Lua itself does not use this
  *   variable; changing its value does not affect any environment, nor vice-versa.
 */
-declare const _G: { [key: string]: unknown; };
+declare const _G: typeof globalThis & Record<string, unknown>;
 
 /**
  * If `object` does not have a metatable, returns nil. Otherwise, if the object's metatable has a `"__metatable"` field,
