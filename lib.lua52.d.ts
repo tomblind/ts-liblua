@@ -954,7 +954,17 @@ declare namespace table {
      * By default, `i` is 1 and `j` is `#list`.
     */
     /** @tupleReturn */
-    export function unpack<A extends unknown[]>(this: void, list: A, i?: number, j?: number): A;
+    export function unpack<A extends unknown[]>(this: void, list: A): A;
+
+    /**
+     * Returns the elements from the given table. This function is equivalent to
+     *
+     *      return list[i], list[i+1], ..., list[j]
+     *
+     * By default, `i` is 1 and `j` is `#list`.
+    */
+    /** @tupleReturn */
+    export function unpack<T>(this: void, list: T[], i: number, j?: number): T[];
 }
 
 declare namespace math {
