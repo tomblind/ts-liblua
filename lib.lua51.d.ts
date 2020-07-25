@@ -1,6 +1,6 @@
 //MIT License
 //
-//Copyright (c) 2019 Tom Blind
+//Copyright (c) 2020 Tom Blind
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy
 //of this software and associated documentation files (the "Software"), to deal
@@ -470,7 +470,8 @@ declare namespace coroutine {
      * Suspends the execution of the calling coroutine. The coroutine cannot be running a C function, a metamethod, or
      *   an iterator. Any arguments to `yield` are passed as extra results to `resume`.
     */
-    export function yield(this: void, ...args: unknown[]): unknown;
+    /** @tupleReturn */
+    export function yield(this: void, ...args: unknown[]): unknown[];
 }
 
 declare type LuaModule = { _NAME: string; _M: LuaModule; } & { [key: string]: unknown; };
