@@ -150,7 +150,7 @@ declare function getfenv(this: void, f: Function | number): unknown;
 declare function getmetatable(this: void, object: unknown): unknown;
 
 /** @luaIterator @tupleReturn */
-declare interface LuaIpairsIterable<T> extends Array<[number, T]> {}
+declare interface LuaIpairsIterable<T> extends Array<[number, Exclude<T, null | undefined>]> {}
 
 /**
  * Returns three values: an iterator function, the table `t`, and 0, so that the construction
@@ -217,7 +217,7 @@ declare function loadstring(
 declare function next<T extends object>(this: void, table: T, index?: keyof T): [keyof T, T[keyof T]];
 
 /** @luaIterator @tupleReturn */
-declare interface LuaPairsIterable<T> extends Array<[keyof T, T[keyof T]]> {}
+declare interface LuaPairsIterable<T> extends Array<[keyof T, Exclude<T[keyof T], null | undefined>]> {}
 
 /**
  * Returns three values: the `next` function, the table `t`, and nil, so that the construction
